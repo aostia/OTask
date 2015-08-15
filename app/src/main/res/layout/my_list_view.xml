@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:paddingTop="@dimen/list_view_padding_vertical"
+    android:paddingBottom="@dimen/list_view_padding_vertical"
+    android:paddingLeft="@dimen/list_view_padding_side"
+    android:paddingRight="@dimen/list_view_padding_side"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="@dimen/task_list_text"
+    android:textColor="@color/background_material_dark"/>
