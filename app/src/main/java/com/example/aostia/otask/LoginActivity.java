@@ -123,6 +123,7 @@ public class LoginActivity extends Activity {
                     push.sendInBackground();
                     //END SENDS PUSH NOTIFICATION
                     */
+                    //test commit
 
                     Intent intent = new Intent(LoginActivity.this, MyTasksActivity.class);
                     startActivity(intent);
