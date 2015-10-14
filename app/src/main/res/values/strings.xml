@@ -10,5 +10,8 @@
     <string name="button_create_task">Create A Task</string>
     <string name="button_final_create">Finish Creating Task</string>
     <string name="title_activity_create_task">Create Task</string>
+    <string name="create_message_text">Description Of Task:</string>
+    <string name="create_date_text">Default: Today</string>
+    <string name="create_time_text">Default: Midnight</string>
 
 </resources>

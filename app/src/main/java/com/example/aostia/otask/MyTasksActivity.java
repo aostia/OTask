@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +36,9 @@ public class MyTasksActivity extends Activity {
     ExpandableListAdapter listAdapter;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
+    private SwipeRefreshLayout swipeContainer;
+    private Button createTaskBtn;
+    private ListView taskListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,30 +48,13 @@ public class MyTasksActivity extends Activity {
         user = ParseUser.getCurrentUser();
         queryTasks();
 
-        Button createTaskBtn = (Button)findViewById(R.id.createTaskButton);
-        ListView taskListView = (ListView)findViewById(R.id.tasksListView);
+        giveSwipeRefreshListener();
+        giveCreateButtonOnClickListener();
+        giveListOnClickListener();
+    }
 
-
-        createTaskBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //SHOW ALERT DIALOG
-                CharSequence usernames[] = new CharSequence[] {"anton", "marie", "miguel", "diana"};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MyTasksActivity.this);
-                builder.setTitle("Create a task for who(m)?");
-                builder.setItems(usernames, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // the user clicked on colors[which]
-                        Intent intent = new Intent(MyTasksActivity.this, CreateTaskActivity.class);
-                        startActivity(intent);
-                    }
-                });
-                builder.show();
-            }
-        });
+    private void giveListOnClickListener() {
+        taskListView = (ListView)findViewById(R.id.tasksListView);
 
         taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -76,7 +63,46 @@ public class MyTasksActivity extends Activity {
 
             }
         });
+    }
 
+    private void giveCreateButtonOnClickListener() {
+        createTaskBtn = (Button)findViewById(R.id.createTaskButton);
+        createTaskBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //SHOW ALERT DIALOG
+                final CharSequence usernames[] = new CharSequence[] {"anton", "marie", "miguel", "diana"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MyTasksActivity.this);
+                builder.setTitle("Create a task for who(m)?");
+                builder.setItems(usernames, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // the user clicked on usernames[which]
+                        Intent intent = new Intent(MyTasksActivity.this, CreateTaskActivity.class);
+                        intent.putExtra("username", usernames[which]);
+                        startActivity(intent);
+                    }
+                });
+                builder.show();
+            }
+        });
+    }
+
+    private void giveSwipeRefreshListener() {
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipe_layout_tasks);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                queryTasks();
+                swipeContainer.setRefreshing(false);
+            }
+        });
     }
 
     private void queryTasks() {

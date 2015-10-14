@@ -48,11 +48,9 @@ import java.util.List;
  */
 public class LoginActivity extends Activity {
 
-    // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
-    public static final String PREFS_LAST_USER = "UserPrefsFile";
-
+    private EditText usernameText;
+    private EditText passwordText;
+    private Button signInButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,26 +60,20 @@ public class LoginActivity extends Activity {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "ZgSjwGm0MVNEkaOdv04ky73pfDnKsNzrEhZIwB1s", "r2TuJJjXNuKxmOSTsLy93T3rewC9plZlsNtIyxWW");
 
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.usernameText);
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(LoginActivity.this, MyTasksActivity.class);
+            startActivity(intent);
+        }
 
-        SharedPreferences settings = getSharedPreferences(PREFS_LAST_USER, MODE_PRIVATE);
-        String lastName = settings.getString("LastUser", "");
-        mEmailView.setText(lastName);
+        usernameText = (EditText) findViewById(R.id.usernameText);
+        passwordText = (EditText) findViewById(R.id.passwordText);
 
-        mPasswordView = (EditText) findViewById(R.id.passwordText);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
+        giveSignInButtonOnClickListener();
+    }
 
-        Button signInButton = (Button) findViewById(R.id.email_sign_in_button);
+    private void giveSignInButtonOnClickListener() {
+        signInButton = (Button) findViewById(R.id.email_sign_in_button);
         signInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,9 +84,8 @@ public class LoginActivity extends Activity {
 
     public void attemptLogin() {
 
-
-        final String username = mEmailView.getText().toString();
-        final String password = mPasswordView.getText().toString();
+        String username = usernameText.getText().toString();
+        String password = passwordText.getText().toString();
 
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             public void done(ParseUser user, ParseException e) {
@@ -106,25 +97,6 @@ public class LoginActivity extends Activity {
                     installation.put("user",ParseUser.getCurrentUser());
                     installation.saveInBackground();
 
-                    SharedPreferences settings = getSharedPreferences(PREFS_LAST_USER, MODE_PRIVATE);
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putString("LastUser", username);
-                    editor.commit();
-
-                    /*
-                    //SENDS PUSH NOTIFICATION
-                    ParseQuery pushQuery = ParseInstallation.getQuery();
-                    pushQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-
-                    // Send push notification to query
-                    ParsePush push = new ParsePush();
-                    push.setQuery(pushQuery); // Set our Installation query
-                    push.setMessage("Please Work");
-                    push.sendInBackground();
-                    //END SENDS PUSH NOTIFICATION
-                    */
-                    //test commit
-
                     Intent intent = new Intent(LoginActivity.this, MyTasksActivity.class);
                     startActivity(intent);
                 } else {
@@ -134,6 +106,7 @@ public class LoginActivity extends Activity {
             }
         });
     }
+
 
 }
 

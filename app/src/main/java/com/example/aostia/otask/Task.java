@@ -7,28 +7,35 @@ import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Task {
     public static List<ParseObject> returnList = new ArrayList<>();
 
-    public static void createTask(String username) {
+    public static void createTask(ParseUser user, String message, Date date) {
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-        query.whereEqualTo("username", username);
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (object == null) {
-                    Log.d("task", "The getFirst request failed.");
-                } else {
-                    Log.d("tsk", "Retrieved the object.");
-                }
-            }
-        });
+        ParseObject tasks = new ParseObject("Task");
+        tasks.put("user", user);
+        tasks.put("taskMessage", message);
+        tasks.put("dueDate", date);
+        tasks.put("completed", false);
+        tasks.saveInBackground();
+
+        //sendPushNotification(user, "Test", date);
+    }
+
+    public static String customDateToString(Date date) {
+        String customToString = date.toString();
+        customToString = customToString.substring(0, 10);
+
+        return customToString;
     }
 }

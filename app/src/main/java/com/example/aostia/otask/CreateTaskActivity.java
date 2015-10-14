@@ -2,20 +2,62 @@ package com.example.aostia.otask;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TabHost;
+import android.widget.TimePicker;
+
+import com.parse.ParseUser;
+
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class CreateTaskActivity extends Activity {
+    //private String username;
+    TimePicker timePicker;
+    DatePicker datePicker;
+    EditText messageText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_task);
 
+        //username = ParseUser.getCurrentUser().getUsername().toString();
+
+        timePicker = (TimePicker)findViewById(R.id.timePicker);
+        timePicker.setCurrentHour(0);
+        timePicker.setCurrentMinute(0);
+
+        datePicker = (DatePicker)findViewById(R.id.datePicker);
+
+        messageText = (EditText)findViewById(R.id.createMessageText);
+
         TabHost tabHost = (TabHost)findViewById(R.id.tabHost);
+        tabHost.setup();
+        tabHost.getTabWidget().setDividerDrawable(R.drawable.abc_list_divider_mtrl_alpha);
+
+        TabHost.TabSpec spec1 = tabHost.newTabSpec("Tab 1");
+        spec1.setContent(R.id.createMessageTab);
+        spec1.setIndicator("Message");
+
+        TabHost.TabSpec spec2 = tabHost.newTabSpec("Tab 2");
+        spec2.setContent(R.id.createDateTab);
+        spec2.setIndicator("Date");
+
+        TabHost.TabSpec spec3 = tabHost.newTabSpec("Tab 3");
+        spec3.setContent(R.id.createTimeTab);
+        spec3.setIndicator("Time");
+
+        tabHost.addTab(spec1);
+        tabHost.addTab(spec2);
+        tabHost.addTab(spec3);
 
     }
 
@@ -43,5 +85,27 @@ public class CreateTaskActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void createTask(View view) {
+
+        int year = datePicker.getYear();
+        int month = datePicker.getMonth();
+        int day = datePicker.getDayOfMonth();
+
+        int hour = timePicker.getCurrentHour();
+        int minute = timePicker.getCurrentMinute();
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DATE, day);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date date = cal.getTime();
+
+        Task.createTask(ParseUser.getCurrentUser(), messageText.getText().toString(), date);
     }
 }
