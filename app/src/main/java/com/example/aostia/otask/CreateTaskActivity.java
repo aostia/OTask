@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,17 +13,24 @@ import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TimePicker;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class CreateTaskActivity extends Activity {
     //private String username;
-    TimePicker timePicker;
-    DatePicker datePicker;
-    EditText messageText;
+    private TimePicker timePicker;
+    private DatePicker datePicker;
+    private EditText messageText;
+    private String username;
+    private ParseUser userNewTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +38,19 @@ public class CreateTaskActivity extends Activity {
         setContentView(R.layout.activity_create_task);
 
         //username = ParseUser.getCurrentUser().getUsername().toString();
+        username = getIntent().getStringExtra("username").toString();
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("username", username);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e == null) {
+                    // The query was successful.
+                    userNewTask = objects.get(0);
+                } else {
+                    // Something went wrong.
+                }
+            }
+        });
 
         timePicker = (TimePicker)findViewById(R.id.timePicker);
         timePicker.setCurrentHour(0);
@@ -106,6 +127,10 @@ public class CreateTaskActivity extends Activity {
         cal.set(Calendar.MILLISECOND, 0);
         Date date = cal.getTime();
 
-        Task.createTask(ParseUser.getCurrentUser(), messageText.getText().toString(), date);
+        Task.createTask(userNewTask, messageText.getText().toString(), date);
+
+        Intent inent = new Intent(CreateTaskActivity.this, MyTasksActivity.class);
+        startActivity(inent);
+
     }
 }
